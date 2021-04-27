@@ -5,17 +5,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
-import java.util.Locale;
+
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PartnerDto  {
+public class PartnerDto {
     private Long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String reference;
-    private Locale locale;
+    @NotBlank
+    @Pattern(regexp = "[a-z]{2}_[A-Z]{2}")
+    private String locale;
     private Date expirationTime;
 }

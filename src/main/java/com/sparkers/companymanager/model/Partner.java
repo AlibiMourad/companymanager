@@ -1,13 +1,12 @@
 package com.sparkers.companymanager.model;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.Locale;
 
@@ -20,7 +19,10 @@ public class Partner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String companyName;
+    @NotBlank
+    @Column(unique = true)
     private String ref;
     private Locale locale;
     private Date expires;

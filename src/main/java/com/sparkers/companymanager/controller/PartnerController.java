@@ -1,14 +1,16 @@
 package com.sparkers.companymanager.controller;
 
 import com.sparkers.companymanager.dto.PartnerDto;
+import com.sparkers.companymanager.exception.ValueValidateException;
 import com.sparkers.companymanager.services.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/partners")
@@ -21,60 +23,45 @@ public class PartnerController {
     @GetMapping
     public ResponseEntity<List<PartnerDto>> listAllPartners(@RequestParam(defaultValue = "0") int from,
                                                             @RequestParam(defaultValue = "10") int size) {
-        List<PartnerDto> partners = partnerService.getAllPartner(from, size);
-        if (partners.isEmpty()) {
-            return new ResponseEntity<List<PartnerDto>>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<List<PartnerDto>>(partners, HttpStatus.OK);
+        return new ResponseEntity<List<PartnerDto>>(partnerService.getAllPartner(from, size), HttpStatus.OK);
     }
 
     // Get  partners by ID : //
     @GetMapping("{id}")
     public ResponseEntity<PartnerDto> getPartner(@PathVariable(required = true) Long id) {
-        Optional<PartnerDto> partner = partnerService.getPartner(id);
-        if (!partner.isPresent()) {
-            return new ResponseEntity<PartnerDto>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<PartnerDto>(partner.get(), HttpStatus.OK);
+        return new ResponseEntity<PartnerDto>(partnerService.getPartner(id), HttpStatus.OK);
     }
 
-    // Add  partners by ID : //
+    // Add  New partners: //
     @PostMapping
-    public ResponseEntity<PartnerDto> addPartner(@RequestBody PartnerDto partnerDto) {
-        if (partnerDto == null) {
-            return new ResponseEntity<PartnerDto>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<PartnerDto> addPartner(@Valid @RequestBody PartnerDto partnerDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValueValidateException();
         }
-        PartnerDto newPartnerDto = partnerService.createPartner(partnerDto);
-        return new ResponseEntity<PartnerDto>(newPartnerDto, HttpStatus.OK);
+        return new ResponseEntity<PartnerDto>(partnerService.createPartner(partnerDto), HttpStatus.CREATED);
     }
+
 
     // UPDATE partners by ID : //
     @PutMapping("{id}")
-    public ResponseEntity<PartnerDto> updatePartner(@PathVariable(required = true) Long id, @RequestBody PartnerDto partnerDto) {
-        if (partnerDto == null) {
-            return new ResponseEntity<PartnerDto>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<PartnerDto> updatePartner(
+            @PathVariable(required = true) Long id,
+            @Valid @RequestBody PartnerDto partnerDto,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValueValidateException();
         }
-        PartnerDto updatedPartnerDto = partnerService.updatePartner(id, partnerDto);
-        return new ResponseEntity<PartnerDto>(updatedPartnerDto, HttpStatus.OK);
+        return new ResponseEntity<PartnerDto>(partnerService.updatePartner(id, partnerDto), HttpStatus.OK);
     }
+
 
     // DELETE  partners by ID : //
     @DeleteMapping("{id}")
     public ResponseEntity<String> deletePartner(@PathVariable(required = true) Long id) {
+
         partnerService.deletePartner(id);
-        return new ResponseEntity<String>("The partner with the given "+ id +" has been deleted", HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+
 
     }
-    // Get All partners : //
-   /* @PostMapping("/partners")
-    public ResponseEntity<Partner> istAllPartners( @RequestBody PartnerDto partnerDto) {
-
-
-         Partner partner = DtoTransformer.transform(partnerDto);
-/*
-        if (partnerRepository.save(partner) != null) {
-            return new ResponseEntity<Partner>(HttpStatus.NO_CONTENT);
-        }*/
-    //return new ResponseEntity<Partner>(partner, HttpStatus.OK);
-    //}*/
 }
