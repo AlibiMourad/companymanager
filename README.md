@@ -26,7 +26,7 @@ gradlew bootRun
 The Tomcat webserver runs on port 8080.
 ```
 
-### Running the JUnite tests
+### Running the JUnit tests
 ```
 gradlew test
 ```
